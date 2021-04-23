@@ -1,15 +1,52 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  getByText,
+  render,
+  waitFor,
+} from "@testing-library/react";
+
 import BubblePage from "./BubblePage";
+import React from "react";
+import axios from "axios";
+
+const data = [
+  {
+    color: "aliceblue",
+    code: {
+      hex: "#f0f8ff",
+    },
+    id: 1,
+  },
+  {
+    color: "limegreen",
+    code: {
+      hex: "#99ddbc",
+    },
+    id: 2,
+  },
+  {
+    color: "aqua",
+    code: {
+      hex: "#00ffff",
+    },
+    id: 3,
+  },
+];
+
+beforeEach(() => {
+  axios.get = jest.fn(() => Promise.resolve({ data: [...data] }));
+});
+
+afterEach(cleanup);
 
 test("Renders BubblePage without errors", () => {
-  // Finish this test
+  render(<BubblePage />);
 });
 
-test("Fetches data and renders the bubbles on mounting", () => {
-  // Finish this test
+test("Fetches data and renders the bubbles on mounting", async () => {
+  await act(async () => {
+    const { getByText } = render(<BubblePage colorList={data} />);
+    await waitFor(() => getByText(/bubble page/i));
+  });
 });
-
-//Task List
-//1. Setup test for basic rendering of component
-//2. Setup test for initial rendering of bubbles on loading

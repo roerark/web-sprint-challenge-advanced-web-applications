@@ -1,25 +1,80 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-const Login = () => {
+import axios from "axios";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+
+const Login = (props) => {
+  const [setToken] = useLocalStorage("token", null);
   // make a post request to retrieve a token from the api
   // when you have handled the token, navigate to the BubblePage route
 
-  useEffect(()=>{
+  const initialState = {
+    username: "",
+    password: "",
+    error: "",
+    isLoading: false,
+  };
+
+  const [state, setState] = useState(initialState);
+
+  useEffect(() => {
     // make a post request to retrieve a token from the api
     // when you have handled the token, navigate to the BubblePage route
   });
-  
-  const error = "";
-  //replace with error state
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    setState({
+      ...state,
+      isLoading: true,
+    });
+    axios
+      .post("http://localhost:5000/api/login", {
+        username: state.username,
+        password: state.password,
+      })
+      .then((res) => {
+        setState({
+          ...state,
+          isLoading: false,
+        });
+        setToken(res.data.payload);
+        props.history.push("/bubble");
+      })
+      .catch((err) =>
+        setState({
+          ...state,
+          error: err.response.data.error,
+          isLoading: false,
+        })
+      );
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setState({
+      ...state,
+      [name]: value,
+    });
+  };
 
   return (
-    <div>
-      <h1>Welcome to the Bubble App!</h1>
-      <div data-testid="loginForm" className="login-form">
-        <h2>Build login form here</h2>
-      </div>
-
-      <p data-testid="errorMessage" className="error">{error}</p>
+    <div style={{ display: "flex", flexFlow: "column wrap", margin: "0 auto" }}>
+      <form onSubmit={onSubmit}>
+        <h1>Welcome to the Bubble App!</h1>
+        <label>
+          username
+          <input type="text" name="username" onChange={handleChange} />
+        </label>
+        <label>
+          password
+          <input type="text" name="password" onChange={handleChange} />
+        </label>
+        <div style={{ color: "red" }}>{state.error}</div>
+        <button style={{ maxWidth: "100px", margin: "20px auto" }}>
+          {state.isLoading ? "loading..." : "login"}
+        </button>
+      </form>
     </div>
   );
 };

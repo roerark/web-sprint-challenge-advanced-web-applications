@@ -1,19 +1,25 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
-
-import Login from "./components/Login";
 import "./styles.scss";
+
+import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
+
+import BubblePage from "./components/BubblePage";
+import Login from "./components/Login";
+import { PrivateRoute } from "./components/PrivateRoute";
+import React from "react";
+
+const NoMatch = () => <h1 style={{ margin: "100px auto" }}>404 Not found</h1>;
 
 function App() {
   return (
     <Router>
       <div className="App">
-        <header>
-          Color Picker Sprint Challenge
-          <a data-testid="logoutButton" href="#">logout</a>
-        </header> 
-
-        <Route exact path="/" component={Login} />
+        <Switch>
+          <PrivateRoute exact path="/bubble" component={BubblePage} />
+          <Route exact path="/" component={Login} />
+          <Route path="*">
+            <NoMatch />
+          </Route>
+        </Switch>
       </div>
     </Router>
   );
